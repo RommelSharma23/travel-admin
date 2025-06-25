@@ -1,0 +1,790 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Travel Proposal - {{customerInfo.customerName}}</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Arial', sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: #fff;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 0;
+        }
+        
+        .header {
+            margin: 0;
+            padding: 0;
+            margin-bottom: 40px;
+            border-bottom: 3px solid #5961F0;
+            padding-bottom: 20px;
+        }
+        
+        .header-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        
+        .logo-column {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .logo {
+            height: 100px;
+            width: auto;
+        }
+        
+        .text-column {
+            text-align: center;
+        }
+        
+        .subtitle {
+            text-align: center;
+            font-size: 16px;
+            color: #666;
+        }
+        
+        .header h1 {
+            color: #5961F0;
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            font-size: 16px;
+            color: #666;
+        }
+        
+        .section {
+            margin-bottom: 30px;
+            background: #f9f9f9;
+            padding: 20px;
+            border-radius: 8px;
+            border-left: 4px solid #5961F0;
+            page-break-inside: avoid;
+        }
+        
+        .section h2 {
+            color: #5961F0;
+            font-size: 20px;
+            margin-bottom: 15px;
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 5px;
+        }
+        
+        .customer-info {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+        
+        .info-item {
+            background: white;
+            padding: 10px;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+        }
+        
+        .info-label {
+            font-weight: bold;
+            color: #555;
+            font-size: 12px;
+            text-transform: uppercase;
+            margin-bottom: 5px;
+        }
+        
+        .info-value {
+            font-size: 14px;
+        }
+        
+        .pricing-container {
+            background: linear-gradient(135deg, #5961F0, #4c54d9);
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+            margin: 20px 0;
+            page-break-inside: avoid;
+        }
+        
+        .pricing-container h3 {
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+        
+        .price-amount {
+            font-size: 36px;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+        
+        .highlights-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 10px;
+            margin: 15px 0;
+            page-break-inside: avoid;
+        }
+        
+        .highlight-item {
+            background: white;
+            padding: 10px;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+            display: flex;
+            align-items: center;
+        }
+        
+        .highlight-item::before {
+            content: "✓";
+            color: #27ae60;
+            font-weight: bold;
+            margin-right: 8px;
+        }
+        
+        .itinerary-day {
+            background: white;
+            margin-bottom: 15px;
+            padding: 15px;
+            border-radius: 6px;
+            border: 1px solid #ddd;
+            page-break-inside: avoid;
+        }
+        
+        .day-header {
+            background: #5961F0;
+            color: white;
+            padding: 8px 12px;
+            border-radius: 4px;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+        
+        .day-description {
+            color: #555;
+            line-height: 1.5;
+        }
+        
+        .inclusions-exclusions {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        
+        .list-container {
+            background: white;
+            padding: 15px;
+            border-radius: 6px;
+            border: 1px solid #ddd;
+        }
+        
+        .list-container h3 {
+            color: #5961F0;
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+        
+        .list-container ul {
+            list-style: none;
+        }
+        
+        .list-container li {
+            padding: 5px 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        
+        .inclusions li::before {
+            content: "✓";
+            color: #27ae60;
+            font-weight: bold;
+            margin-right: 8px;
+        }
+        
+        .exclusions li::before {
+            content: "✗";
+            color: #5961F0;
+            font-weight: bold;
+            margin-right: 8px;
+        }
+        
+        .footer {
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 2px solid #5961F0;
+            text-align: center;
+            color: #666;
+            font-size: 12px;
+        }
+        
+        @media print {
+            body { 
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+        }
+        
+        .full-width {
+            grid-column: 1 / -1;
+        }
+        
+        /* New page styles */
+        .new-page {
+            page-break-before: always;
+            min-height: 100vh;
+            padding: 20px 15px;
+            position: relative;
+        }
+        
+        .page-background {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            opacity: 0.1;
+            z-index: -1;
+        }
+        
+        .faq-background {
+            background-image: url('https://tfhkqqdlphfizikoxcqo.supabase.co/storage/v1/object/public/getaway-vibe/logo-branding/pdf_doc_images/FAQ.jpg');
+        }
+        
+        .payment-background {
+            background-image: url('https://tfhkqqdlphfizikoxcqo.supabase.co/storage/v1/object/public/getaway-vibe/logo-branding/pdf_doc_images/Payments.jpg');
+        }
+        
+        .cancellation-background {
+            background-image: url('https://tfhkqqdlphfizikoxcqo.supabase.co/storage/v1/object/public/getaway-vibe/logo-branding/pdf_doc_images/Cancellation_policy.jpg');
+        }
+        
+        .page-header {
+            text-align: center;
+            margin-bottom: 25px;
+            border-bottom: 3px solid #5961F0;
+            padding-bottom: 15px;
+        }
+        
+        .page-header h1 {
+            color: #5961F0;
+            font-size: 24px;
+            margin: 0;
+        }
+        
+        .page-content {
+            position: relative;
+            z-index: 1;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        
+        .faq-item {
+            margin-bottom: 15px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .faq-question {
+            font-weight: bold;
+            color: #5961F0;
+            font-size: 14px;
+            margin-bottom: 6px;
+        }
+        
+        .faq-answer {
+            color: #555;
+            line-height: 1.4;
+            font-size: 13px;
+        }
+        
+        .payment-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin: 20px 0;
+        }
+        
+        .payment-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        .payment-label {
+            font-weight: bold;
+            color: #5961F0;
+        }
+        
+        .payment-value {
+            color: #333;
+        }
+        
+        .policy-section {
+            margin-bottom: 15px;
+        }
+        
+        .policy-title {
+            font-weight: bold;
+            color: #5961F0;
+            font-size: 15px;
+            margin-bottom: 8px;
+        }
+        
+        .policy-text {
+            color: #555;
+            line-height: 1.4;
+            margin-bottom: 10px;
+            font-size: 13px;
+        }
+        
+        .charges-list {
+            list-style: none;
+            padding-left: 0;
+        }
+        
+        .charges-list li {
+            padding: 5px 0;
+            border-bottom: 1px solid #f0f0f0;
+            color: #555;
+            font-size: 13px;
+        }
+        
+        .charges-list li strong {
+            color: #5961F0;
+        }
+        
+        /* Cover Page Styles */
+        .cover-page {
+            height: 100vh;
+            padding: 20px 20px 0 20px;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            align-items: center;
+            page-break-after: always;
+            margin: 0;
+            box-sizing: border-box;
+        }
+        
+        .cover-logo {
+            height: 120px;
+            width: auto;
+            margin-bottom: 30px;
+            margin-top: 40px;
+        }
+        
+        .hero-image {
+            width: 80%;
+            max-width: 600px;
+            height: 350px;
+            object-fit: cover;
+            border-radius: 12px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+            margin-bottom: 50px;
+        }
+        
+        .cover-text {
+            max-width: 600px;
+        }
+        
+        .cover-proposal-title {
+            font-size: 24px;
+            color: #5961F0;
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+        
+        .cover-destination {
+            font-size: 28px;
+            color: #333;
+            font-weight: bold;
+            margin-bottom: 6px;
+        }
+        
+        .cover-package-title {
+            font-size: 18px;
+            color: #666;
+            margin-bottom: 12px;
+            font-style: italic;
+        }
+        
+        .cover-tagline {
+            font-size: 16px;
+            color: #5961F0;
+            font-weight: 500;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Cover Page -->
+        <div class="cover-page">
+            <img src="https://tfhkqqdlphfizikoxcqo.supabase.co/storage/v1/object/public/getaway-vibe/logo-branding/logo_color.png" alt="Get Away Vibe Logo" class="cover-logo" />
+            
+            {{#if heroImage}}
+            <img src="{{heroImage}}" alt="{{tripDetails.destination}}" class="hero-image" />
+            {{else}}
+            <img src="https://tfhkqqdlphfizikoxcqo.supabase.co/storage/v1/object/public/getaway-vibe/logo-branding/logo_color.png" alt="Travel" class="hero-image" style="object-fit: contain; background: #f8f9fa;" />
+            {{/if}}
+            
+            <div class="cover-text">
+                <div class="cover-proposal-title">Travel Proposal for {{customerInfo.customerName}}</div>
+                <div class="cover-destination">Discover {{tripDetails.destination}}</div>
+                <div class="cover-package-title">{{tripDetails.packageTitle}}</div>
+                <div class="cover-tagline">Your vibe Your Journey Your GETAWay</div>
+            </div>
+        </div>
+
+        <!-- Itinerary Header -->
+        <div class="header" style="padding: 20px; margin-top: 0;">
+            <div class="header-content">
+                <div class="logo-column">
+                    <img src="https://tfhkqqdlphfizikoxcqo.supabase.co/storage/v1/object/public/getaway-vibe/logo-branding/logo_color.png" alt="Get Away Vibe Logo" class="logo" />
+                </div>
+                <div class="text-column">
+                    <h1>Itinerary</h1>
+                </div>
+                <div class="blank-column">
+                    <!-- Empty column for spacing -->
+                </div>
+            </div>
+            <p class="subtitle">Customized Itinerary for {{customerInfo.customerName}}</p>
+        </div>
+
+        <!-- Customer Information -->
+        <div class="section">
+            <h2>Customer Information</h2>
+            <div class="customer-info">
+                <div class="info-item">
+                    <div class="info-label">Customer Name</div>
+                    <div class="info-value">{{customerInfo.customerName}}</div>
+                </div>
+                {{#if customerInfo.email}}
+                <div class="info-item">
+                    <div class="info-label">Email</div>
+                    <div class="info-value">{{customerInfo.email}}</div>
+                </div>
+                {{/if}}
+                {{#if customerInfo.phone}}
+                <div class="info-item">
+                    <div class="info-label">Phone</div>
+                    <div class="info-value">{{customerInfo.phone}}</div>
+                </div>
+                {{/if}}
+                <div class="info-item">
+                    <div class="info-label">Total Travelers</div>
+                    <div class="info-value">{{customerInfo.totalTravelers}} People</div>
+                </div>
+                {{#if customerInfo.travelStartDate}}
+                <div class="info-item">
+                    <div class="info-label">Travel Dates</div>
+                    <div class="info-value">{{customerInfo.travelStartDate}} - {{customerInfo.travelEndDate}}</div>
+                </div>
+                {{/if}}
+                {{#if customerInfo.specialRequirements}}
+                <div class="info-item full-width">
+                    <div class="info-label">Special Requirements</div>
+                    <div class="info-value">{{customerInfo.specialRequirements}}</div>
+                </div>
+                {{/if}}
+            </div>
+        </div>
+
+        <!-- Trip Details -->
+        <div class="section">
+            <h2>Trip Details</h2>
+            <div class="info-item" style="margin-bottom: 15px;">
+                <div class="info-label">Package Title</div>
+                <div class="info-value" style="font-size: 18px; font-weight: bold;">{{tripDetails.packageTitle}}</div>
+            </div>
+            <div class="customer-info">
+                <div class="info-item">
+                    <div class="info-label">Destination</div>
+                    <div class="info-value">{{tripDetails.destination}}</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Duration</div>
+                    <div class="info-value">{{tripDetails.duration}}</div>
+                </div>
+                {{#if tripDetails.maxGroupSize}}
+                <div class="info-item">
+                    <div class="info-label">Max Group Size</div>
+                    <div class="info-value">{{tripDetails.maxGroupSize}} People</div>
+                </div>
+                {{/if}}
+            </div>
+            {{#if tripDetails.tripDescription}}
+            <div class="info-item" style="margin-top: 15px;">
+                <div class="info-label">Trip Description</div>
+                <div class="info-value">{{tripDetails.tripDescription}}</div>
+            </div>
+            {{/if}}
+            {{#if tripDetails.packageHighlights}}
+            <div style="margin-top: 15px;">
+                <div class="info-label">Package Highlights</div>
+                <div class="highlights-grid">
+                    {{#each tripDetails.packageHighlights}}
+                    <div class="highlight-item">{{this}}</div>
+                    {{/each}}
+                </div>
+            </div>
+            {{/if}}
+        </div>
+
+        <!-- Pricing -->
+        <div class="pricing-container">
+            <h3>Total Package Price</h3>
+            <div class="price-amount">{{pricing.currency}} {{pricing.totalPackagePrice}}</div>
+            {{#if pricing.priceNotes}}
+            <p>{{pricing.priceNotes}}</p>
+            {{/if}}
+        </div>
+
+        <!-- Inclusions & Exclusions -->
+        {{#if inclusions}}
+        <div class="section">
+            <h2>Inclusions & Exclusions</h2>
+            <div class="inclusions-exclusions">
+                <div class="list-container">
+                    <h3>Inclusions</h3>
+                    <ul class="inclusions">
+                        {{#each inclusions}}
+                        <li>{{this}}</li>
+                        {{/each}}
+                    </ul>
+                </div>
+                {{#if exclusions}}
+                <div class="list-container">
+                    <h3>Exclusions</h3>
+                    <ul class="exclusions">
+                        {{#each exclusions}}
+                        <li>{{this}}</li>
+                        {{/each}}
+                    </ul>
+                </div>
+                {{/if}}
+            </div>
+        </div>
+        {{else}}
+        {{#if exclusions}}
+        <div class="section">
+            <h2>Inclusions & Exclusions</h2>
+            <div class="inclusions-exclusions">
+                <div class="list-container">
+                    <h3>Exclusions</h3>
+                    <ul class="exclusions">
+                        {{#each exclusions}}
+                        <li>{{this}}</li>
+                        {{/each}}
+                    </ul>
+                </div>
+            </div>
+        </div>
+        {{/if}}
+        {{/if}}
+
+        <!-- Itinerary -->
+        {{#if itinerary}}
+        <div class="section">
+            <h2>Detailed Itinerary</h2>
+            {{#each itinerary}}
+            <div class="itinerary-day">
+                <div class="day-header">Day {{this.dayNumber}}: {{this.dayTitle}}</div>
+                {{#if this.dayDescription}}
+                <div class="day-description">{{this.dayDescription}}</div>
+                {{/if}}
+            </div>
+            {{/each}}
+        </div>
+        {{/if}}
+
+        <!-- Terms & Conditions -->
+        {{#if additionalInfo.termsConditions}}
+        <div class="section">
+            <h2>Terms & Conditions</h2>
+            <div class="info-item">
+                <div class="info-value" style="white-space: pre-line;">{{additionalInfo.termsConditions}}</div>
+            </div>
+        </div>
+        {{/if}}
+
+        <!-- Additional Notes -->
+        {{#if additionalInfo.additionalNotes}}
+        <div class="section">
+            <h2>Additional Notes</h2>
+            <div class="info-item">
+                <div class="info-value" style="white-space: pre-line;">{{additionalInfo.additionalNotes}}</div>
+            </div>
+        </div>
+        {{/if}}
+
+        <!-- FAQ Page -->
+        <div class="new-page">
+            <div class="page-background faq-background"></div>
+            <div class="page-header">
+                <h1>Frequently Asked Questions</h1>
+            </div>
+            
+            <div class="page-content">
+                <div class="faq-item">
+                    <div class="faq-question">How do I know this itinerary suits my interests?</div>
+                    <div class="faq-answer">If you created this itinerary on our website, you would have noticed that we keep your interests in mind and use our smart algorithm to suggest the cities and activities that are most suitable for you. And if our travel consultants had a chat with you and sent this itinerary - Be rest assured they would have taken extra efforts to ensure this itinerary perfectly suits your requirements. You can always customize this itinerary further by clicking on the 'Make Changes' link in this doc.</div>
+                </div>
+                
+                <div class="faq-item">
+                    <div class="faq-question">What kind of Visa Assistance would be provided by GetAway Vibe?</div>
+                    <div class="faq-answer">Visa isn't rocket science but it can be nerve-wracking for some destinations. Worry not! We are here to help. We will provide information on the documents that need to be submitted, best practices for applying for a visa, how to book your appointment and assist you in the process throughout.</div>
+                </div>
+                
+                <div class="faq-item">
+                    <div class="faq-question">Is this itinerary customizable? How can I make changes to further personalize it according to my requirement?</div>
+                    <div class="faq-answer">Of course! This itinerary is completely yours and you can personalize it however you want your vacation to be! Just click on the link 'Make Changes' in this document and it will take you to your own Journey Routers itinerary and you can 'Edit' the trip or 'Change' flights or hotels or activities or anything you absolutely wish to do!</div>
+                </div>
+                
+                <div class="faq-item">
+                    <div class="faq-question">Is the itinerary cost real-time? How long are these prices valid?</div>
+                    <div class="faq-answer">Yes, everything you see as a part of your itinerary is real-time costing and you would be able to book your vacation for those prices. However, the costs of flights, hotels and some activities are highly fluctuating and will change as per demand. Your costed itinerary will expire in 6 hours and you need to click on 'Update Cost' to view the current updated price for the itinerary.</div>
+                </div>
+                
+                <div class="faq-item">
+                    <div class="faq-question">How do I confirm and book this itinerary?</div>
+                    <div class="faq-answer">You are vacation-ready! You can book the entire trip by paying just 70% cost of the total cost.</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Payment Policy Page -->
+        <div class="new-page">
+            <div class="page-background payment-background"></div>
+            <div class="page-header">
+                <h1>Payment Policy</h1>
+            </div>
+            
+            <div class="page-content">
+                <div class="policy-section">
+                    <div class="policy-title">Payment Details</div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin: 20px 0;">
+                        <div style="background: white; padding: 15px; border-radius: 6px; border: 1px solid #ddd;">
+                            <div style="font-weight: bold; color: #5961F0; margin-bottom: 5px;">BENEFICIARY</div>
+                            <div style="color: #333;">INNOLOGIA TECHNOLOGIES</div>
+                        </div>
+                        <div style="background: white; padding: 15px; border-radius: 6px; border: 1px solid #ddd;">
+                            <div style="font-weight: bold; color: #5961F0; margin-bottom: 5px;">A/C NO.</div>
+                            <div style="color: #333;">6046140984</div>
+                        </div>
+                        <div style="background: white; padding: 15px; border-radius: 6px; border: 1px solid #ddd;">
+                            <div style="font-weight: bold; color: #5961F0; margin-bottom: 5px;">A/C TYPE</div>
+                            <div style="color: #333;">CURRENT</div>
+                        </div>
+                        <div style="background: white; padding: 15px; border-radius: 6px; border: 1px solid #ddd;">
+                            <div style="font-weight: bold; color: #5961F0; margin-bottom: 5px;">BANK</div>
+                            <div style="color: #333;">KOTAK MAHINDRA</div>
+                        </div>
+                        <div style="background: white; padding: 15px; border-radius: 6px; border: 1px solid #ddd; grid-column: 1 / -1;">
+                            <div style="font-weight: bold; color: #5961F0; margin-bottom: 5px;">IFSC CODE</div>
+                            <div style="color: #333;">KKBK0003545</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="policy-section">
+                    <div class="policy-title">Payment Terms</div>
+                    <div style="background: white; padding: 12px; border-radius: 6px; border: 1px solid #ddd;">
+                        <ul style="list-style: none; padding: 0; margin: 0;">
+                            <li style="padding: 5px 0; border-bottom: 1px solid #f0f0f0; font-size: 13px;"><strong style="color: #5961F0;">Booking Confirmation:</strong> You can book the entire trip by paying just 70% of the total cost</li>
+                            <li style="padding: 5px 0; border-bottom: 1px solid #f0f0f0; font-size: 13px;"><strong style="color: #5961F0;">Balance Payment:</strong> Remaining 30% to be paid before travel</li>
+                            <li style="padding: 5px 0; border-bottom: 1px solid #f0f0f0; font-size: 13px;"><strong style="color: #5961F0;">Payment Methods:</strong> Bank transfer, online payment gateways</li>
+                            <li style="padding: 5px 0; font-size: 13px;"><strong style="color: #5961F0;">Price Validity:</strong> All prices are subject to availability and may change based on demand</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="policy-section">
+                    <div class="policy-title">Important Notes</div>
+                    <div style="background: white; padding: 12px; border-radius: 6px; border: 1px solid #ddd;">
+                        <ul style="list-style: none; padding: 0; margin: 0;">
+                            <li style="padding: 5px 0; border-bottom: 1px solid #f0f0f0; font-size: 13px;"><strong style="color: #5961F0;">Itinerary Validity:</strong> Costs are real-time and valid for 6 hours</li>
+                            <li style="padding: 5px 0; border-bottom: 1px solid #f0f0f0; font-size: 13px;"><strong style="color: #5961F0;">Price Fluctuation:</strong> Flight and hotel prices are highly fluctuating</li>
+                            <li style="padding: 5px 0; border-bottom: 1px solid #f0f0f0; font-size: 13px;"><strong style="color: #5961F0;">Update Cost:</strong> Click 'Update Cost' to view current pricing</li>
+                            <li style="padding: 5px 0; font-size: 13px;"><strong style="color: #5961F0;">Late Payment Fee:</strong> INR 5,000 (applicable within allowable payment limits)</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Cancellation Policy Page -->
+        <div class="new-page">
+            <div class="page-background cancellation-background"></div>
+            <div class="page-header">
+                <h1>Cancellation Policy</h1>
+            </div>
+            
+            <div class="page-content">
+                <div class="policy-section">
+                    <div class="policy-title">Airline Policy</div>
+                    <div class="policy-text">All flight cancellations are subject to the specific terms and conditions of the respective airline. Refund eligibility and processing times vary by carrier.</div>
+                </div>
+                
+                <div class="policy-section">
+                    <div class="policy-title">Hotel Policy</div>
+                    <div class="policy-text">Hotel cancellations follow the individual property's cancellation terms. Some hotels offer free cancellation within specified timeframes, while others may have restrictions.</div>
+                </div>
+                
+                <div class="policy-section">
+                    <div class="policy-title">Cancellation Charges</div>
+                    <ul class="charges-list">
+                        <li><strong>More than 20 days before travel:</strong> 25% cancellation charges apply</li>
+                        <li><strong>Within 20 days of travel:</strong> No refund available</li>
+                        <li><strong>Cancellation fee:</strong> INR 2,500 per passenger</li>
+                    </ul>
+                </div>
+                
+                <div class="policy-section">
+                    <div class="policy-title">Rescheduling Charges</div>
+                    <ul class="charges-list">
+                        <li><strong>Rescheduling fee:</strong> INR 2,000 per passenger</li>
+                        <li><strong>Plus fare difference:</strong> If applicable for both flights and land components</li>
+                    </ul>
+                </div>
+                
+                <div class="policy-section">
+                    <div class="policy-title">Additional Fees</div>
+                    <ul class="charges-list">
+                        <li><strong>Late Payment Fee:</strong> INR 5,000 (applicable within allowable payment limits)</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <!-- Footer moved here - right after cancellation policy -->
+            <div class="footer">
+                <p>Generated on {{generatedDate}} | Get Away Vibe</p>
+                <p>Thank you for choosing our travel services!</p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
