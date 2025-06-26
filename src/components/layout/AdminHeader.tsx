@@ -4,30 +4,33 @@
 import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/Button'
 import { Badge } from '@/components/ui/Badge'
+import { adminAuth, type AdminUser } from '@/lib/auth/admin-auth'
 
-export function AdminHeader() {
+interface AdminHeaderProps {
+  user?: AdminUser; // Make it optional for backward compatibility
+}
+
+export function AdminHeader({ user }: AdminHeaderProps = {}) {
   const router = useRouter()
 
-  // Mock user data for now
-  const currentUser = {
-    name: 'Super Admin',
-    email: 'admin@yoursite.com',
-    role: 'super_admin'
+  // Use passed user or get current user as fallback
+  const currentUser = user || adminAuth.getCurrentUser()
+
+  const handleLogout = () => {
+    adminAuth.logout()
+    router.push('/login')
   }
 
-  const handleLogout = async () => {
-    try {
-      const response = await fetch('/api/auth/logout', {
-        method: 'POST',
-      })
-
-      if (response.ok) {
-        router.push('/login')
-        router.refresh()
-      }
-    } catch (error) {
-      console.error('Logout error:', error)
-    }
+  // If no user, show fallback
+  if (!currentUser) {
+    return (
+      <header className="h-16 bg-white border-b border-gray-200 flex items-center justify-between px-6 ml-64">
+        <div className="flex items-center">
+          <h2 className="text-lg font-semibold text-gray-900">Dashboard</h2>
+        </div>
+        <div>Loading...</div>
+      </header>
+    )
   }
 
   return (
@@ -53,9 +56,9 @@ export function AdminHeader() {
         <div className="flex items-center space-x-3">
           <div className="text-right">
             <p className="text-sm font-medium text-gray-900">
-              {currentUser.name}
+              {currentUser.first_name} {currentUser.last_name}
             </p>
-            <p className="text-xs text-gray-500">
+            <p className="text-xs text-gray-500 capitalize">
               {currentUser.role.replace('_', ' ')}
             </p>
           </div>
@@ -63,7 +66,7 @@ export function AdminHeader() {
           {/* User avatar */}
           <div className="h-8 w-8 bg-blue-600 rounded-full flex items-center justify-center">
             <span className="text-white text-sm font-medium">
-              SA
+              {currentUser.first_name?.[0]}{currentUser.last_name?.[0]}
             </span>
           </div>
 

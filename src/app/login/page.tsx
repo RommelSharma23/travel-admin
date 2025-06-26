@@ -1,276 +1,184 @@
 // src/app/login/page.tsx
-'use client'
+'use client';
 
-import { useState } from 'react'
-import { useRouter } from 'next/navigation'
-import { Button } from '@/components/ui/Button'
-import { Input } from '@/components/ui/Input'
-import { Label } from '@/components/ui/Label'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/Card'
+import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import { adminAuth } from '@/lib/auth/admin-auth';
 
-export default function LoginPage() {
-  const [email, setEmail] = useState('admin@yoursite.com')
-  const [password, setPassword] = useState('admin123')
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState('')
-  const [adminUsers, setAdminUsers] = useState<any>(null)
-  const [loginResult, setLoginResult] = useState<any>(null)
-  const [createResult, setCreateResult] = useState<any>(null)
-  const router = useRouter()
+export default function AdminLogin() {
+  const [email, setEmail] = useState('admin@admin.com');
+  const [password, setPassword] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+  const router = useRouter();
 
-  const testAdminUsers = async () => {
-    setLoading(true)
-    try {
-      const response = await fetch('/api/test-admin')
-      const result = await response.json()
-      setAdminUsers(result)
-    } catch (error) {
-      setAdminUsers({ success: false, error: 'Network error' })
+  // Check if already logged in
+  useEffect(() => {
+    const user = adminAuth.getCurrentUser();
+    if (user) {
+      router.push('/dashboard'); // Redirect to dashboard if already logged in
     }
-    setLoading(false)
-  }
-
-  const createCorrectAdmin = async () => {
-    setLoading(true)
-    try {
-      const response = await fetch('/api/create-admin', {
-        method: 'POST'
-      })
-      const result = await response.json()
-      setCreateResult(result)
-      
-      // Refresh admin users list after creating
-      if (result.success) {
-        setTimeout(() => testAdminUsers(), 1000)
-      }
-    } catch (error) {
-      setCreateResult({ success: false, error: 'Network error' })
-    }
-    setLoading(false)
-  }
-
-  const testLoginAPI = async () => {
-    setLoading(true)
-    try {
-      const response = await fetch('/api/auth/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          email: 'admin@yoursite.com',
-          password: 'admin123'
-        })
-      })
-      
-      const result = await response.json()
-      setLoginResult({
-        status: response.status,
-        ...result
-      })
-    } catch (error) {
-      setLoginResult({ success: false, error: 'Network error' })
-    }
-    setLoading(false)
-  }
+  }, [router]);
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setLoading(true)
-    setError('')
+    e.preventDefault();
+    setLoading(true);
+    setError('');
 
     try {
-      const response = await fetch('/api/auth/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ email, password }),
-      })
-
-      const data = await response.json()
-
-      if (response.ok) {
-        // Login successful
-        router.push('/dashboard')
-        router.refresh() // Refresh to update auth state
+      const result = await adminAuth.login(email, password);
+      
+      if (result.success) {
+        router.push('/dashboard'); // ← CHANGED: This was '/admin', now '/dashboard'
       } else {
-        setError(data.error || 'Login failed')
-        if (data.debug) {
-          console.log('Debug info:', data.debug)
-        }
+        setError(result.error || 'Login failed');
       }
-    } catch (error) {
-      setError('Network error. Please try again.')
+    } catch (err) {
+      setError('An unexpected error occurred');
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-2xl w-full space-y-6">
-        <div className="text-center">
-          <h2 className="mt-6 text-3xl font-extrabold text-gray-900">
+      <div className="max-w-md w-full space-y-8">
+        {/* Header */}
+        <div>
+          <div className="mx-auto h-12 w-12 flex items-center justify-center rounded-full bg-blue-100">
+            <svg
+              className="h-6 w-6 text-blue-600"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
+              />
+            </svg>
+          </div>
+          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
             Travel Admin Dashboard
           </h2>
-          <p className="mt-2 text-sm text-gray-600">
+          <p className="mt-2 text-center text-sm text-gray-600">
             Sign in to your admin account
           </p>
         </div>
 
-        {/* Fix Section */}
-        <Card className="border-green-200 bg-green-50">
-          <CardHeader>
-            <CardTitle className="text-lg text-green-800">🔧 Fix: Create Admin with Correct Password</CardTitle>
-            <CardDescription className="text-green-700">
-              The password hash in your database is incorrect. Click to create a new admin user with the proper bcrypt hash.
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <Button onClick={createCorrectAdmin} disabled={loading} className="w-full mb-2">
-              Create Admin User (Correct Hash)
-            </Button>
-            
-            {createResult && (
-              <div className="mt-2 p-3 bg-white rounded text-xs">
-                <div className={`mb-2 p-2 rounded ${
-                  createResult.success ? 'bg-green-100' : 'bg-red-100'
-                }`}>
-                  {createResult.success ? '✅ Admin created successfully!' : '❌ Failed to create admin'}
+        {/* Login Form */}
+        <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
+          {/* Error Message */}
+          {error && (
+            <div className="rounded-md bg-red-50 p-4">
+              <div className="flex">
+                <div className="flex-shrink-0">
+                  <svg
+                    className="h-5 w-5 text-red-400"
+                    fill="currentColor"
+                    viewBox="0 0 20 20"
+                  >
+                    <path
+                      fillRule="evenodd"
+                      d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+                      clipRule="evenodd"
+                    />
+                  </svg>
                 </div>
-                <details>
-                  <summary className="cursor-pointer">Show details</summary>
-                  <pre className="mt-2 overflow-auto max-h-32">
-                    {JSON.stringify(createResult, null, 2)}
-                  </pre>
-                </details>
+                <div className="ml-3">
+                  <h3 className="text-sm font-medium text-red-800">
+                    {error}
+                  </h3>
+                </div>
               </div>
-            )}
-          </CardContent>
-        </Card>
-
-        {/* Debug Tests Section */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <Card className="border-blue-200">
-            <CardHeader>
-              <CardTitle className="text-lg">🔍 Debug: Check Database</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <Button onClick={testAdminUsers} disabled={loading} variant="outline" className="w-full mb-2">
-                Check Admin Users Table
-              </Button>
-              
-              {adminUsers && (
-                <div className="mt-2 p-3 bg-gray-100 rounded text-xs">
-                  <div className={`mb-2 p-2 rounded ${
-                    adminUsers.success ? 'bg-green-100' : 'bg-red-100'
-                  }`}>
-                    {adminUsers.success ? `✅ Found ${adminUsers.count} users` : '❌ Database Error'}
-                  </div>
-                  <details>
-                    <summary className="cursor-pointer">Show details</summary>
-                    <pre className="mt-2 overflow-auto max-h-32">
-                      {JSON.stringify(adminUsers, null, 2)}
-                    </pre>
-                  </details>
-                </div>
-              )}
-            </CardContent>
-          </Card>
-
-          <Card className="border-orange-200">
-            <CardHeader>
-              <CardTitle className="text-lg">🧪 Debug: Test Login API</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <Button onClick={testLoginAPI} disabled={loading} variant="outline" className="w-full mb-2">
-                Test Login API
-              </Button>
-              
-              {loginResult && (
-                <div className="mt-2 p-3 bg-gray-100 rounded text-xs">
-                  <div className={`mb-2 p-2 rounded ${
-                    loginResult.success ? 'bg-green-100' : 'bg-red-100'
-                  }`}>
-                    Status: {loginResult.status} - {loginResult.success ? 'Success' : 'Failed'}
-                  </div>
-                  <details>
-                    <summary className="cursor-pointer">Show details</summary>
-                    <pre className="mt-2 overflow-auto max-h-32">
-                      {JSON.stringify(loginResult, null, 2)}
-                    </pre>
-                  </details>
-                </div>
-              )}
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Main Login Form */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Admin Login</CardTitle>
-            <CardDescription>
-              Enter your credentials to access the dashboard
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <form onSubmit={handleSubmit} className="space-y-4">
-              {error && (
-                <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">
-                  {error}
-                </div>
-              )}
-
-              <div className="space-y-2">
-                <Label htmlFor="email">Email address</Label>
-                <Input
-                  id="email"
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="admin@yoursite.com"
-                  required
-                  disabled={loading}
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="password">Password</Label>
-                <Input
-                  id="password"
-                  type="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder="Enter your password"
-                  required
-                  disabled={loading}
-                />
-              </div>
-
-              <Button 
-                type="submit" 
-                className="w-full"
-                disabled={loading}
-              >
-                {loading ? 'Signing in...' : 'Sign in'}
-              </Button>
-            </form>
-
-            <div className="mt-6 p-4 bg-blue-50 rounded-lg">
-              <p className="text-sm font-medium text-blue-900 mb-2">
-                🔐 Test Credentials
-              </p>
-              <p className="text-xs text-blue-700">
-                Email: admin@yoursite.com<br />
-                Password: admin123
-              </p>
-              <p className="text-xs text-blue-600 mt-2">
-                After creating the correct admin user above, login should work!
-              </p>
             </div>
-          </CardContent>
-        </Card>
+          )}
+
+          <div className="rounded-md shadow-sm -space-y-px">
+            {/* Email Input */}
+            <div>
+              <label htmlFor="email" className="sr-only">
+                Email address
+              </label>
+              <input
+                id="email"
+                name="email"
+                type="email"
+                autoComplete="email"
+                required
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
+                placeholder="Email address"
+                disabled={loading}
+              />
+            </div>
+
+            {/* Password Input */}
+            <div>
+              <label htmlFor="password" className="sr-only">
+                Password
+              </label>
+              <input
+                id="password"
+                name="password"
+                type="password"
+                autoComplete="current-password"
+                required
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
+                placeholder="Password"
+                disabled={loading}
+              />
+            </div>
+          </div>
+
+          {/* Submit Button */}
+          <div>
+            <button
+              type="submit"
+              disabled={loading}
+              className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {loading && (
+                <svg
+                  className="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                >
+                  <circle
+                    className="opacity-25"
+                    cx="12"
+                    cy="12"
+                    r="10"
+                    stroke="currentColor"
+                    strokeWidth="4"
+                  ></circle>
+                  <path
+                    className="opacity-75"
+                    fill="currentColor"
+                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                  ></path>
+                </svg>
+              )}
+              {loading ? 'Signing in...' : 'Sign in'}
+            </button>
+          </div>
+
+          {/* Demo Credentials */}
+          <div className="mt-4 p-3 bg-blue-50 rounded-md">
+            <p className="text-xs text-blue-800">
+              <strong>Admin Credentials:</strong><br />
+              Email: admin@admin.com<br />
+              Password: [Use the password you set in Supabase]
+            </p>
+          </div>
+        </form>
       </div>
     </div>
-  )
+  );
 }

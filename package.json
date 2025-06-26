@@ -11,7 +11,8 @@
   "dependencies": {
     "@heroicons/react": "^2.2.0",
     "@hookform/resolvers": "^5.1.1",
-    "@supabase/supabase-js": "^2.50.0",
+    "@supabase/auth-helpers-nextjs": "^0.10.0",
+    "@supabase/supabase-js": "^2.50.2",
     "@types/handlebars": "^4.0.40",
     "@types/mime-types": "^3.0.1",
     "@types/puppeteer": "^5.4.7",
